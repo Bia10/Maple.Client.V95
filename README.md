@@ -1,4 +1,4 @@
-# Maple.Client.V95
+﻿# Maple.Client.V95
 
 ![.NET](https://img.shields.io/badge/net10.0-5C2D91?logo=.NET&labelColor=gray)
 ![C#](https://img.shields.io/badge/C%23-14.0-239120?labelColor=gray)
@@ -16,7 +16,12 @@ MapleStory GMS v95 client structures, runtime memory access, and function disass
 ## Example
 
 ```csharp
-// Example code will be auto-populated from ReadMeTest.cs by tests
+// Demonstrate core API — client struct registry and address constants.
+var registry = ClientStructs.Registry;
+_ = registry.StructNames;
+
+var addr = ClientStructs.Addresses.CWvsContextSingletonPtr;
+_ = addr;
 ```
 
 For more examples see [Example Catalogue](#example-catalogue).
@@ -48,7 +53,12 @@ The following examples are available in [ReadMeTest.cs](src/Maple.Client.V95.Doc
 ### Example - Empty
 
 ```csharp
-// Example code will be auto-populated from ReadMeTest.cs by tests
+// Demonstrate core API — client struct registry and address constants.
+var registry = ClientStructs.Registry;
+_ = registry.StructNames;
+
+var addr = ClientStructs.Addresses.CWvsContextSingletonPtr;
+_ = addr;
 ```
 
 ## Public API Reference

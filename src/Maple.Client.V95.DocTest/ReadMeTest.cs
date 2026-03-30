@@ -34,7 +34,7 @@ public partial class ReadMeTest
     {
         // Demonstrate core API — client struct registry and address constants.
         var registry = ClientStructs.Registry;
-        _ = registry.Fields.Count;
+        _ = registry.StructNames;
 
         var addr = ClientStructs.Addresses.CWvsContextSingletonPtr;
         _ = addr;

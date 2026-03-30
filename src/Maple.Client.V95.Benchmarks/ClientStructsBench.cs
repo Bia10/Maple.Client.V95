@@ -1,3 +1,4 @@
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 
 namespace Maple.Client.V95.Benchmarks;
@@ -5,5 +6,5 @@ namespace Maple.Client.V95.Benchmarks;
 public class ClientStructsBench
 {
     [Benchmark]
-    public int RegistryFieldCount() => ClientStructs.Registry.Fields.Count;
+    public int RegistryStructCount() => ClientStructs.Registry.StructNames.Count();
 }

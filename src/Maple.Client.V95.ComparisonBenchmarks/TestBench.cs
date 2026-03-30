@@ -1,3 +1,4 @@
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 
@@ -11,5 +12,5 @@ public class TestBench
     public int Count { get; set; }
 
     [Benchmark(Baseline = true)]
-    public int MapleClientV95____() => ClientStructs.Registry.Fields.Count * Count;
+    public int MapleClientV95____() => ClientStructs.Registry.StructNames.Count() * Count;
 }
