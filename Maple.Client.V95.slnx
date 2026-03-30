@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="src/Maple.Client.V95/Maple.Client.V95.csproj" />
+  <Project Path="src/Maple.Client.V95.Analysis/Maple.Client.V95.Analysis.csproj" />
+  <Project Path="src/Maple.Client.V95.Runtime/Maple.Client.V95.Runtime.csproj" />
+  <Project Path="src/Maple.Client.V95.Test/Maple.Client.V95.Test.csproj" />
+  <Project Path="src/Maple.Client.V95.Analysis.Test/Maple.Client.V95.Analysis.Test.csproj" />
+  <Project Path="src/Maple.Client.V95.DocTest/Maple.Client.V95.DocTest.csproj" />
+  <Project Path="src/Maple.Client.V95.Benchmarks/Maple.Client.V95.Benchmarks.csproj" />
+  <Project Path="src/Maple.Client.V95.ComparisonBenchmarks/Maple.Client.V95.ComparisonBenchmarks.csproj" />
+  <Project Path="src/Maple.Client.V95.Tester/Maple.Client.V95.Tester.csproj" />
+</Solution>
