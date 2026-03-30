@@ -3,62 +3,51 @@ namespace Maple.Client.V95.Runtime;
 /// <summary>
 /// Stable context snapshot for one login-monitor polling operation.
 /// </summary>
-public sealed class LoginMonitorContext
+/// <remarks>
+/// Creates one login-monitor context snapshot.
+/// </remarks>
+public sealed class LoginMonitorContext(
+    string description,
+    TimeSpan timeout,
+    TimeSpan pollingInterval,
+    int attemptCount,
+    TimeSpan elapsed,
+    bool stateResolved,
+    RawLoginState? rawState
+)
 {
-    /// <summary>
-    /// Creates one login-monitor context snapshot.
-    /// </summary>
-    public LoginMonitorContext(
-        string description,
-        TimeSpan timeout,
-        TimeSpan pollingInterval,
-        int attemptCount,
-        TimeSpan elapsed,
-        bool stateResolved,
-        RawLoginState? rawState
-    )
-    {
-        Description = description ?? throw new ArgumentNullException(nameof(description));
-        Timeout = timeout;
-        PollingInterval = pollingInterval;
-        AttemptCount = attemptCount;
-        Elapsed = elapsed;
-        StateResolved = stateResolved;
-        RawState = rawState;
-    }
-
     /// <summary>
     /// Gets the human-readable wait description.
     /// </summary>
-    public string Description { get; }
+    public string Description { get; } = description ?? throw new ArgumentNullException(nameof(description));
 
     /// <summary>
     /// Gets the total timeout configured for the wait.
     /// </summary>
-    public TimeSpan Timeout { get; }
+    public TimeSpan Timeout { get; } = timeout;
 
     /// <summary>
     /// Gets the polling interval configured for the wait.
     /// </summary>
-    public TimeSpan PollingInterval { get; }
+    public TimeSpan PollingInterval { get; } = pollingInterval;
 
     /// <summary>
     /// Gets the 1-based poll attempt count reached for this snapshot.
     /// </summary>
-    public int AttemptCount { get; }
+    public int AttemptCount { get; } = attemptCount;
 
     /// <summary>
     /// Gets the elapsed time at the moment the snapshot was created.
     /// </summary>
-    public TimeSpan Elapsed { get; }
+    public TimeSpan Elapsed { get; } = elapsed;
 
     /// <summary>
     /// Gets whether one raw login state could be resolved for this poll attempt.
     /// </summary>
-    public bool StateResolved { get; }
+    public bool StateResolved { get; } = stateResolved;
 
     /// <summary>
     /// Gets the resolved raw state when one was available for this snapshot.
     /// </summary>
-    public RawLoginState? RawState { get; }
+    public RawLoginState? RawState { get; } = rawState;
 }

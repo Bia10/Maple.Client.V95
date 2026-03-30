@@ -8,6 +8,13 @@
 
   <ItemGroup>
     <ProjectReference Include="../Maple.Client.V95/Maple.Client.V95.csproj" />
+    <ProjectReference Include="../Maple.Client.V95.Runtime/Maple.Client.V95.Runtime.csproj" />
+    <ProjectReference Include="../Maple.Client.V95.Analysis/Maple.Client.V95.Analysis.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Maple.Memory" />
+    <PackageReference Include="Maple.Process" />
   </ItemGroup>
 
   <ItemGroup>

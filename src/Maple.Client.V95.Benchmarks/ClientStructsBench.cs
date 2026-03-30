@@ -6,5 +6,5 @@ namespace Maple.Client.V95.Benchmarks;
 public class ClientStructsBench
 {
     [Benchmark]
-    public int RegistryStructCount() => ClientStructs.Registry.StructNames.Count();
+    public static int RegistryStructCount() => ClientStructs.Registry.StructNames.Count();
 }

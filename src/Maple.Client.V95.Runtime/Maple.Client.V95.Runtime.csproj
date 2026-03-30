@@ -9,7 +9,7 @@
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <EnableAOTAnalyzer>true</EnableAOTAnalyzer>
 
-    <Description>Attached-process runtime helpers for MapleStory GMS v95 client memory access, singleton resolution, and guarded login-flow interaction. Cross-platform, trimmable and AOT/NativeAOT compatible.</Description>
+    <Description>Attached-process runtime helpers for MapleStory GMS v95 client memory access, singleton resolution, and guarded login-flow interaction. Windows-only, trimmable and AOT/NativeAOT compatible.</Description>
 
     <PackageId>Maple.Client.V95.Runtime</PackageId>
     <PackageTags>maplestory;game-reverse-engineering;v95;runtime-memory;maple-re</PackageTags>

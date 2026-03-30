@@ -11,19 +11,14 @@ namespace Maple.Client.V95.Runtime;
 /// discovery and workflow-specific automation should stay outside this layer until the rest of the
 /// `Maple.Memory` extraction is in place.
 /// </remarks>
-public sealed class FieldAccessor
+/// <remarks>
+/// Creates a field accessor over <paramref name="memoryAccessor"/>.
+/// </remarks>
+public sealed class FieldAccessor(MemoryAccessor memoryAccessor, StructFieldRegistry? registry = null)
 {
-    private readonly MemoryAccessor _memoryAccessor;
-    private readonly StructFieldRegistry _registry;
-
-    /// <summary>
-    /// Creates a field accessor over <paramref name="memoryAccessor"/>.
-    /// </summary>
-    public FieldAccessor(MemoryAccessor memoryAccessor, StructFieldRegistry? registry = null)
-    {
-        _memoryAccessor = memoryAccessor ?? throw new ArgumentNullException(nameof(memoryAccessor));
-        _registry = registry ?? ClientStructs.Registry;
-    }
+    private readonly MemoryAccessor _memoryAccessor =
+        memoryAccessor ?? throw new ArgumentNullException(nameof(memoryAccessor));
+    private readonly StructFieldRegistry _registry = registry ?? ClientStructs.Registry;
 
     /// <summary>
     /// Resolves one field offset from the registry.

@@ -7,6 +7,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+using Maple.Client.V95.Analysis;
+using Maple.Client.V95.Runtime;
+using Maple.Memory;
+using Maple.Process;
 using PublicApiGenerator;
 
 namespace Maple.Client.V95.DocTest;
@@ -25,19 +30,89 @@ public partial class ReadMeTest
     static readonly string s_readmeFilePath = s_rootDirectory + "README.md";
 
     // ─────────────────────────────────────────────────────────────
-    // SECTION 1: Write your README example code here.
-    // These methods are directly snipped into README.md by the update test.
+    // SECTION 1: README example methods — bodies are snipped into README.md.
     // ─────────────────────────────────────────────────────────────
 
     [Test]
     public void ReadMeTest_()
     {
-        // Demonstrate core API — client struct registry and address constants.
-        var registry = ClientStructs.Registry;
-        _ = registry.StructNames;
+        // Look up a known struct field by name — returns the byte offset within the struct.
+        bool found = ClientStructs.Registry.TryGetField("CWvsContext", "WorldId", out StructField worldId);
+        Debug.Assert(found);
+        Debug.Assert(worldId.Offset == ClientStructs.Offsets.CWvsContext.WorldId);
 
-        var addr = ClientStructs.Addresses.CWvsContextSingletonPtr;
-        _ = addr;
+        // Walk all known struct names in the registry.
+        foreach (string structName in ClientStructs.Registry.StructNames)
+            Debug.Assert(structName.Length > 0);
+
+        // Look up a static address constant.
+        uint loginPtr = ClientStructs.Addresses.CWvsContextSingletonPtr;
+        Debug.Assert(loginPtr != 0);
+    }
+
+    [Test]
+    public void ReadMeTest_StructRegistryAndOffsets()
+    {
+        // Iterate all fields registered for one struct.
+        IReadOnlyDictionary<string, StructField> loginFields = ClientStructs.Registry.GetFields("CLogin");
+        foreach ((string name, StructField field) in loginFields)
+            Console.WriteLine($"CLogin.{name} @ +0x{field.Offset:X}");
+
+        // Look up a single field — offset matches the typed constant.
+        ClientStructs.Registry.TryGetField("CLogin", "LoginStep", out StructField step);
+        Debug.Assert(step.Offset == ClientStructs.Offsets.CLogin.LoginStep);
+
+        // The singleton map enumerates all pointer-table addresses with their names.
+        foreach ((uint addr, string name) in ClientStructs.Singletons)
+            Console.WriteLine($"0x{addr:X8} → {name}");
+    }
+
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public void ReadMeTest_RuntimeSingletonResolution()
+    {
+        // Skip when not attached to a live MapleStory process.
+        if (!ProcessHandle.TryAttach("MapleStory", out ProcessHandle? handle))
+            return;
+        using ProcessHandle process = handle!;
+        using WindowsProcessMemory memory = WindowsProcessMemory.Open(process);
+        using var accessor = new MemoryAccessor(memory);
+        var singletons = new SingletonResolver(accessor);
+
+        // Resolve CWvsContext by name — returns false when the client is not running.
+        if (!singletons.TryResolve("CWvsContext", out ResolvedSingleton ctx))
+            return;
+
+        Console.WriteLine($"{ctx.Name}: instance @ 0x{ctx.InstanceAddress:X8}");
+
+        // Resolve the full login-flow state when the client is in the login screen.
+        var resolver = new LoginStateResolver(accessor);
+        if (!resolver.TryResolve(out ResolvedLoginState state))
+            return;
+
+        Console.WriteLine($"LoginStep={state.Step}  World={state.ContextWorldId}  Channel={state.ContextChannelId}");
+    }
+
+    [Test]
+    [SupportedOSPlatform("windows")]
+    public void ReadMeTest_AnalysisDisassembly()
+    {
+        // Skip when not attached to a live MapleStory process.
+        if (!ProcessHandle.TryAttach("MapleStory", out ProcessHandle? handle))
+            return;
+        using ProcessHandle process = handle!;
+        using WindowsProcessMemory memory = WindowsProcessMemory.Open(process);
+        using var accessor = new MemoryAccessor(memory);
+
+        // Capture the main module image into managed memory — one stable snapshot for all analysis.
+        ProcessPeImageSnapshot snapshot = ProcessPeImageSnapshot.CaptureMainModule(process, accessor);
+
+        // Disassemble one known function from the snapshot.
+        var analyzer = new RuntimeFunctionAnalyzer(snapshot);
+        FunctionDisassembly disassembly = analyzer.Disassemble(ClientStructs.Addresses.SendLoginPacketFunc);
+
+        foreach (FunctionInstruction instr in disassembly.Instructions)
+            Console.WriteLine(instr);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -60,7 +135,9 @@ public partial class ReadMeTest
         var testBlocksToUpdate = new (string StartLineContains, string ReadmeLineBeforeCodeBlock)[]
         {
             (nameof(ReadMeTest_) + "()", "## Example"),
-            (nameof(ReadMeTest_) + "()", "### Example - Empty"),
+            (nameof(ReadMeTest_StructRegistryAndOffsets) + "()", "### Example - Struct registry and offsets"),
+            (nameof(ReadMeTest_RuntimeSingletonResolution) + "()", "### Example - Runtime singleton resolution"),
+            (nameof(ReadMeTest_AnalysisDisassembly) + "()", "### Example - Analysis disassembly"),
         };
 
         readmeLines = UpdateReadme(
@@ -75,79 +152,6 @@ public partial class ReadMeTest
 
         var newReadme = string.Join(Environment.NewLine, readmeLines) + Environment.NewLine;
         File.WriteAllText(s_readmeFilePath, newReadme, System.Text.Encoding.UTF8);
-    }
-
-#if NET10_0
-    [Test]
-#endif
-    public void ReadMeTest_UpdateBenchmarksInMarkdown()
-    {
-        if (!File.Exists(s_readmeFilePath))
-        {
-            return;
-        }
-
-        var readmeFilePath = s_readmeFilePath;
-        var benchmarkFileNameToConfig = new Dictionary<
-            string,
-            (string Description, string ReadmeBefore, string ReadmeEnd, string SectionPrefix)
-        >()
-        {
-            {
-                "TestBench.md",
-                ("TestBench Benchmark Results", "##### TestBench Benchmark Results", "## Example Catalogue", "######")
-            },
-        };
-
-        var benchmarksDirectory = Path.Combine(s_rootDirectory, "benchmarks");
-        if (!Directory.Exists(benchmarksDirectory))
-        {
-            return;
-        }
-
-        var processorDirectories = Directory.EnumerateDirectories(benchmarksDirectory).ToArray();
-        var readmeLines = File.ReadAllLines(readmeFilePath);
-
-        foreach (var (fileName, config) in benchmarkFileNameToConfig)
-        {
-            var all = "";
-            foreach (var processorDirectory in processorDirectories)
-            {
-                var contentsFilePath = Path.Combine(processorDirectory, fileName);
-                if (!File.Exists(contentsFilePath))
-                {
-                    continue;
-                }
-
-                var versionsFilePath = Path.Combine(processorDirectory, "Versions.txt");
-                var versions = File.ReadAllText(versionsFilePath);
-                var contents = File.ReadAllText(contentsFilePath);
-                var processor = processorDirectory
-                    .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                    .Last();
-                var section = $"{config.SectionPrefix}{processor} - {config.Description} ({versions})";
-                var benchmarkTable = contents.Substring(contents.IndexOf('|'));
-                all += $"{section}{Environment.NewLine}{Environment.NewLine}{benchmarkTable}{Environment.NewLine}";
-            }
-
-            if (all.Length == 0)
-            {
-                continue;
-            }
-
-            readmeLines = ReplaceReadmeLines(
-                readmeLines,
-                [all],
-                config.ReadmeBefore,
-                config.SectionPrefix,
-                0,
-                config.ReadmeEnd,
-                0
-            );
-        }
-
-        var newReadme = string.Join(Environment.NewLine, readmeLines) + Environment.NewLine;
-        File.WriteAllText(readmeFilePath, newReadme, System.Text.Encoding.UTF8);
     }
 
 #if NET10_0
@@ -243,7 +247,7 @@ public partial class ReadMeTest
                 l => l.StartsWith(readmeEndLineStartsWith, StringComparison.Ordinal)
             ) + readmeEndLineOffset;
 
-        return readmeLines[..replaceStart].AsEnumerable().Concat(newLines).Concat(readmeLines[replaceEnd..]).ToArray();
+        return [.. readmeLines[..replaceStart].AsEnumerable(), .. newLines, .. readmeLines[replaceEnd..]];
     }
 
     static string[] SnipLines(
@@ -261,9 +265,11 @@ public partial class ReadMeTest
         var end =
             Array.FindIndex(sourceLines, start, l => l.StartsWith(endLineStartsWith, StringComparison.Ordinal))
             + endLineOffset;
-        return sourceLines[start..end]
-            .Select(l => l.Length > whitespaceToRemove ? l.Remove(0, whitespaceToRemove) : l.TrimStart())
-            .ToArray();
+        return
+        [
+            .. sourceLines[start..end]
+                .Select(l => l.Length > whitespaceToRemove ? l[whitespaceToRemove..] : l.TrimStart()),
+        ];
     }
 
     static string SourceFile([CallerFilePath] string sourceFilePath = "") => sourceFilePath;

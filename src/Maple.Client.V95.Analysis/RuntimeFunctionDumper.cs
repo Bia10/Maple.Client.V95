@@ -6,15 +6,12 @@ namespace Maple.Client.V95.Analysis;
 /// <summary>
 /// Shared batch runtime-dumping surface above snapshot capture and per-function analysis.
 /// </summary>
-public sealed class RuntimeFunctionDumper
+/// <remarks>
+/// Creates a batch runtime function dumper over an existing analyzer.
+/// </remarks>
+public sealed class RuntimeFunctionDumper(RuntimeFunctionAnalyzer analyzer)
 {
-    private readonly RuntimeFunctionAnalyzer _analyzer;
-
-    /// <summary>
-    /// Creates a batch runtime function dumper over an existing analyzer.
-    /// </summary>
-    public RuntimeFunctionDumper(RuntimeFunctionAnalyzer analyzer) =>
-        _analyzer = analyzer ?? throw new ArgumentNullException(nameof(analyzer));
+    private readonly RuntimeFunctionAnalyzer _analyzer = analyzer ?? throw new ArgumentNullException(nameof(analyzer));
 
     /// <summary>
     /// Creates a batch runtime function dumper over one captured process snapshot.

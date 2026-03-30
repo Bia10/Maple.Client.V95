@@ -9,7 +9,7 @@
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <EnableAOTAnalyzer>true</EnableAOTAnalyzer>
 
-    <Description>Snapshot-backed x86 runtime function disassembly helpers for MapleStory GMS v95 client analysis. Cross-platform, trimmable and AOT/NativeAOT compatible.</Description>
+    <Description>Snapshot-backed x86 runtime function disassembly helpers for MapleStory GMS v95 client analysis. Windows-only, trimmable and AOT/NativeAOT compatible.</Description>
 
     <PackageId>Maple.Client.V95.Analysis</PackageId>
     <PackageTags>maplestory;game-reverse-engineering;v95;disassembly;maple-re</PackageTags>
