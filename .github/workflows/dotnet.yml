@@ -1,0 +1,163 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: dotnet
+
+permissions: read-all
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version to tag and create"
+        required: false
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+  NuGetDirectory: ${{ github.workspace }}/nuget
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        os: [windows-latest, windows-11-arm]
+        configuration: [Debug, Release]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup .NET (global.json)
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c ${{ matrix.configuration }} --no-restore
+
+      - name: Test
+        run: dotnet test -c ${{ matrix.configuration }} --no-build --verbosity normal
+
+  coverage:
+    runs-on: windows-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup .NET (global.json)
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Install dotnet-coverage
+        run: dotnet tool install --global dotnet-coverage
+
+      - name: Collect coverage
+        run: |
+          dotnet-coverage collect --output TestResults/coverage.test.xml --output-format cobertura -- dotnet run --project src/Maple.Client.V95.Test/Maple.Client.V95.Test.csproj -c Release --no-build -- --no-ansi
+          dotnet-coverage collect --output TestResults/coverage.doctest.xml --output-format cobertura -- dotnet run --project src/Maple.Client.V95.DocTest/Maple.Client.V95.DocTest.csproj -c Release --no-build -- --no-ansi
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+        with:
+          files: TestResults/coverage.test.xml,TestResults/coverage.doctest.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  format:
+    runs-on: windows-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Setup .NET
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        with:
+          global-json-file: global.json
+      - name: Restore tools
+        run: dotnet tool restore
+      - name: CSharpier verify no changes
+        run: dotnet csharpier check .
+      - name: Format style verify no changes
+        run: dotnet format style --verify-no-changes
+      - name: Format analyzers verify no changes
+        run: dotnet format analyzers --verify-no-changes
+
+  pack:
+    runs-on: windows-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0 # full history for MinVer
+      - name: Create tag (to set version)
+        if: ${{ github.event.inputs.version != '' && github.actor == 'Bia10' }}
+        run: git tag v${{ github.event.inputs.version }}
+      - name: Setup .NET
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        with:
+          global-json-file: global.json
+      - name: Pack NuGet package
+        run: dotnet pack -c Release --output ${{ env.NuGetDirectory }}
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+        with:
+          name: nuget
+          if-no-files-found: error
+          retention-days: 7
+          path: ${{ env.NuGetDirectory }}/*nupkg
+
+  create-release-push:
+    needs: [build-and-test, format, coverage, pack]
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      id-token: write
+    if: ${{ github.event.inputs.version != '' && github.actor == 'Bia10' }}
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Download nuget packages
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: nuget
+          path: ${{ env.NuGetDirectory }}
+      - name: Setup .NET
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        with:
+          global-json-file: global.json
+      - name: Push packages
+        shell: bash
+        run: |
+          dotnet nuget push "${{ env.NuGetDirectory }}"/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push "${{ env.NuGetDirectory }}"/*.snupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
