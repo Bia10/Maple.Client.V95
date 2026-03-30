@@ -1,4 +1,4 @@
-# Maple.Client.V95
+﻿# Maple.Client.V95
 
 ![.NET](https://img.shields.io/badge/net10.0-5C2D91?logo=.NET&labelColor=gray)
 ![C#](https://img.shields.io/badge/C%23-14.0-239120?labelColor=gray)
@@ -44,7 +44,12 @@ Benchmarks.
 
 ##### TestBench Benchmark Results
 
-###### Results will be populated here after running `dotnet Build.cs comparison-bench` then `dotnet test`
+######WIN-4JIQ1EAG9C3 - TestBench Benchmark Results (.NET 10.0.5)
+
+| Method             | Count | Mean     | Error     | StdDev    | Ratio |
+|------------------- |------ |---------:|----------:|----------:|------:|
+| MapleClientV95____ | 25000 | 5.586 ns | 0.0488 ns | 0.0457 ns |  1.00 |
+
 
 ## Example Catalogue
 

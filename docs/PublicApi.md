@@ -1,4 +1,4 @@
-# Public API Reference
+﻿# Public API Reference
 
 ## Public API Reference
 
