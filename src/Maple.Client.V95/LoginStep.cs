@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95;
+namespace Maple.Client.V95;
 
 /// <summary>
 /// Client-side <c>CLogin::m_nLoginStep</c> values for the GMS v95 client.

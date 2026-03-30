@@ -1,4 +1,4 @@
-﻿# Maple.Client.V95
+# Maple.Client.V95
 
 ![.NET](https://img.shields.io/badge/net10.0-5C2D91?logo=.NET&labelColor=gray)
 ![C#](https://img.shields.io/badge/C%23-14.0-239120?labelColor=gray)

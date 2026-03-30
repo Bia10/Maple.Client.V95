@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Analysis;
+namespace Maple.Client.V95.Analysis;
 
 /// <summary>
 /// Names one runtime function target to analyze.

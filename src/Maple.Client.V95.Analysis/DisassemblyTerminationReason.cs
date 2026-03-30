@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Analysis;
+namespace Maple.Client.V95.Analysis;
 
 /// <summary>
 /// Explains why one linear function disassembly stopped.

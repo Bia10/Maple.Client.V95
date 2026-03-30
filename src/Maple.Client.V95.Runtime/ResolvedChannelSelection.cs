@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Runtime;
+namespace Maple.Client.V95.Runtime;
 
 /// <summary>
 /// The current channel selection resolved from the v95 login UI state.

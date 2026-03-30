@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Runtime;
+namespace Maple.Client.V95.Runtime;
 
 /// <summary>
 /// Describes one stage in the shared login-monitor polling lifecycle.

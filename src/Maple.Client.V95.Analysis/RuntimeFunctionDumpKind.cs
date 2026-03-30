@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Analysis;
+namespace Maple.Client.V95.Analysis;
 
 /// <summary>
 /// Selects how runtime function dumping should analyze each target.

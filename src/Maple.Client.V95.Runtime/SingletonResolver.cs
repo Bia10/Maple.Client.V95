@@ -1,4 +1,4 @@
-﻿using Maple.Memory;
+using Maple.Memory;
 
 namespace Maple.Client.V95.Runtime;
 

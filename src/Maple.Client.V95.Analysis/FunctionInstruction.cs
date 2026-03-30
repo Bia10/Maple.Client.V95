@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Analysis;
+namespace Maple.Client.V95.Analysis;
 
 /// <summary>
 /// One decoded x86 instruction from a runtime function snapshot.

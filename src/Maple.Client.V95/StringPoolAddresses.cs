@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95;
+namespace Maple.Client.V95;
 
 /// <summary>
 /// Static <c>.data</c> section addresses for a StringPool binary.

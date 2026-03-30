@@ -1,4 +1,4 @@
-﻿using Maple.Process;
+using Maple.Process;
 
 namespace Maple.Client.V95.Analysis;
 

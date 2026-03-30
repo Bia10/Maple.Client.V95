@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Maple.Memory;
 
 namespace Maple.Client.V95.Runtime;

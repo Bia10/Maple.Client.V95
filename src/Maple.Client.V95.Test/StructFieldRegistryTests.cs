@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Test;
+namespace Maple.Client.V95.Test;
 
 public sealed class StructFieldRegistryTests
 {

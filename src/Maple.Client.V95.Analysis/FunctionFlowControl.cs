@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Analysis;
+namespace Maple.Client.V95.Analysis;
 
 /// <summary>
 /// Reduced x86 control-flow classification for one decoded instruction.

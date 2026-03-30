@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Runtime;
+namespace Maple.Client.V95.Runtime;
 
 /// <summary>
 /// One decoded GMS v95 <c>WorldItem</c> entry.

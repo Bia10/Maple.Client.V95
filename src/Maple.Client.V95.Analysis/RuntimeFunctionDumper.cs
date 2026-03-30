@@ -1,4 +1,4 @@
-﻿using System.Runtime.Versioning;
+using System.Runtime.Versioning;
 using Maple.Memory;
 
 namespace Maple.Client.V95.Analysis;

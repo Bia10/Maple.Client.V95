@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Runtime;
+namespace Maple.Client.V95.Runtime;
 
 /// <summary>
 /// Describes why a guarded login-selection workflow step could not be performed.

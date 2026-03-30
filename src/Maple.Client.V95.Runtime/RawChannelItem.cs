@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95.Runtime;
+namespace Maple.Client.V95.Runtime;
 
 /// <summary>
 /// One undecoded GMS v95 <c>ChannelItem</c> entry.

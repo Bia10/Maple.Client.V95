@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95;
+namespace Maple.Client.V95;
 
 /// <summary>
 /// Pre-built client layouts for known MapleStory versions.

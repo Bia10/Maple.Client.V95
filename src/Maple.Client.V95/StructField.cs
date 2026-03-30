@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95;
+namespace Maple.Client.V95;
 
 /// <summary>
 /// Describes one named field within a version-specific client struct.

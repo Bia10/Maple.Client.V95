@@ -1,4 +1,4 @@
-﻿namespace Maple.Client.V95;
+namespace Maple.Client.V95;
 
 public static partial class ClientStructs
 {
